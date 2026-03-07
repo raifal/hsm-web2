@@ -1,0 +1,815 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Temperature Measurements Service",
+        "description": "REST API for submitting temperature measurements from sensors",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/": {
+            "get": {
+                "summary": "Root",
+                "description": "Health check endpoint (no authentication required)",
+                "operationId": "root__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/measurements": {
+            "get": {
+                "summary": "List Measurements",
+                "description": "Retrieve all stored temperature measurements from the database.",
+                "operationId": "list_measurements_api_measurements_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/TemperatureMeasurementRead"
+                                    },
+                                    "type": "array",
+                                    "title": "Response List Measurements Api Measurements Get"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "HTTPBasic": []
+                    }
+                ]
+            },
+            "post": {
+                "summary": "Create Measurement",
+                "description": "Submit a temperature measurement from a sensor. Creates sensor if it doesn't exist.",
+                "operationId": "create_measurement_api_measurements_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TemperatureMeasurementCreate"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TemperatureMeasurementRead"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "HTTPBasic": []
+                    }
+                ]
+            }
+        },
+        "/api/measurements/batch": {
+            "post": {
+                "summary": "Create Measurements Batch",
+                "description": "Submit a batch of temperature measurements from one or more sensors. Creates sensors if they don't exist.",
+                "operationId": "create_measurements_batch_api_measurements_batch_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TemperatureMeasurementRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TemperatureMeasurementResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "HTTPBasic": []
+                    }
+                ]
+            }
+        },
+        "/api/measurements/day/{target_date}": {
+            "get": {
+                "summary": "List Measurements By Day",
+                "description": "Retrieve all temperature measurements for a given day, grouped by sensor address.",
+                "operationId": "list_measurements_by_day_api_measurements_day__target_date__get",
+                "security": [
+                    {
+                        "HTTPBasic": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "target_date",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "title": "Target Date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/SensorDayMeasurements"
+                                    },
+                                    "title": "Response List Measurements By Day Api Measurements Day  Target Date  Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/measurements/{measurement_id}": {
+            "get": {
+                "summary": "Get Measurement",
+                "description": "Retrieve a specific temperature measurement.",
+                "operationId": "get_measurement_api_measurements__measurement_id__get",
+                "security": [
+                    {
+                        "HTTPBasic": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "measurement_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Measurement Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TemperatureMeasurementRead"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update Measurement",
+                "description": "Update a specific temperature measurement.",
+                "operationId": "update_measurement_api_measurements__measurement_id__put",
+                "security": [
+                    {
+                        "HTTPBasic": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "measurement_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Measurement Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TemperatureMeasurementCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TemperatureMeasurementRead"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete Measurement",
+                "description": "Clear all stored measurements (for testing purposes)",
+                "operationId": "delete_measurement_api_measurements__measurement_id__delete",
+                "security": [
+                    {
+                        "HTTPBasic": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "measurement_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Measurement Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sensors/{sensorAddress}": {
+            "delete": {
+                "summary": "Delete Sensor",
+                "operationId": "delete_sensor_api_sensors__sensorAddress__delete",
+                "security": [
+                    {
+                        "HTTPBasic": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "sensorAddress",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Sensoraddress"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "summary": "Get Sensor",
+                "operationId": "get_sensor_api_sensors__sensorAddress__get",
+                "security": [
+                    {
+                        "HTTPBasic": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "sensorAddress",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Sensoraddress"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SensorRead"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update Sensor",
+                "operationId": "update_sensor_api_sensors__sensorAddress__put",
+                "security": [
+                    {
+                        "HTTPBasic": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "sensorAddress",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Sensoraddress"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SensorCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SensorRead"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sensors": {
+            "get": {
+                "summary": "List Sensors",
+                "operationId": "list_sensors_api_sensors_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/SensorRead"
+                                    },
+                                    "type": "array",
+                                    "title": "Response List Sensors Api Sensors Get"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "HTTPBasic": []
+                    }
+                ]
+            },
+            "post": {
+                "summary": "Create Sensor",
+                "operationId": "create_sensor_api_sensors_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SensorCreate"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SensorRead"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "HTTPBasic": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "HTTPValidationError": {
+                "properties": {
+                    "detail": {
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        },
+                        "type": "array",
+                        "title": "Detail"
+                    }
+                },
+                "type": "object",
+                "title": "HTTPValidationError"
+            },
+            "MeasurementItem": {
+                "properties": {
+                    "temperature": {
+                        "type": "number",
+                        "title": "Temperature"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Timestamp"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "temperature",
+                    "timestamp"
+                ],
+                "title": "MeasurementItem"
+            },
+            "SensorCreate": {
+                "properties": {
+                    "sensorAddress": {
+                        "type": "string",
+                        "title": "Sensoraddress"
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "title": "Active",
+                        "default": true
+                    },
+                    "color": {
+                        "type": "string",
+                        "title": "Color",
+                        "default": ""
+                    },
+                    "name": {
+                        "type": "string",
+                        "title": "Name",
+                        "default": ""
+                    },
+                    "groupName": {
+                        "type": "string",
+                        "title": "Groupname",
+                        "default": ""
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "sensorAddress"
+                ],
+                "title": "SensorCreate"
+            },
+            "SensorDayMeasurements": {
+                "properties": {
+                    "sensor_address": {
+                        "type": "string",
+                        "title": "Sensor Address"
+                    },
+                    "measurements": {
+                        "items": {
+                            "$ref": "#/components/schemas/MeasurementItem"
+                        },
+                        "type": "array",
+                        "title": "Measurements"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "sensor_address",
+                    "measurements"
+                ],
+                "title": "SensorDayMeasurements"
+            },
+            "SensorRead": {
+                "properties": {
+                    "sensorAddress": {
+                        "type": "string",
+                        "title": "Sensoraddress"
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "title": "Active",
+                        "default": true
+                    },
+                    "color": {
+                        "type": "string",
+                        "title": "Color",
+                        "default": ""
+                    },
+                    "name": {
+                        "type": "string",
+                        "title": "Name",
+                        "default": ""
+                    },
+                    "groupName": {
+                        "type": "string",
+                        "title": "Groupname",
+                        "default": ""
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "sensorAddress"
+                ],
+                "title": "SensorRead"
+            },
+            "TemperatureMeasurement": {
+                "properties": {
+                    "sensorAddress": {
+                        "type": "string",
+                        "title": "Sensoraddress"
+                    },
+                    "temperature": {
+                        "type": "number",
+                        "title": "Temperature"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Timestamp"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "sensorAddress",
+                    "temperature",
+                    "timestamp"
+                ],
+                "title": "TemperatureMeasurement",
+                "description": "Model for a single temperature measurement"
+            },
+            "TemperatureMeasurementCreate": {
+                "properties": {
+                    "sensor_address": {
+                        "type": "string",
+                        "title": "Sensor Address"
+                    },
+                    "temperature": {
+                        "type": "number",
+                        "title": "Temperature"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Timestamp"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "sensor_address",
+                    "temperature",
+                    "timestamp"
+                ],
+                "title": "TemperatureMeasurementCreate"
+            },
+            "TemperatureMeasurementRead": {
+                "properties": {
+                    "sensor_address": {
+                        "type": "string",
+                        "title": "Sensor Address"
+                    },
+                    "temperature": {
+                        "type": "number",
+                        "title": "Temperature"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Timestamp"
+                    },
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "sensor_address",
+                    "temperature",
+                    "timestamp",
+                    "id"
+                ],
+                "title": "TemperatureMeasurementRead"
+            },
+            "TemperatureMeasurementRequest": {
+                "properties": {
+                    "measurements": {
+                        "items": {
+                            "$ref": "#/components/schemas/TemperatureMeasurement"
+                        },
+                        "type": "array",
+                        "title": "Measurements"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "measurements"
+                ],
+                "title": "TemperatureMeasurementRequest",
+                "description": "Model for request containing a list of temperature measurements"
+            },
+            "TemperatureMeasurementResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "title": "Success"
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "measurements_received": {
+                        "type": "integer",
+                        "title": "Measurements Received"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "success",
+                    "message",
+                    "measurements_received"
+                ],
+                "title": "TemperatureMeasurementResponse",
+                "description": "Model for response after processing measurements"
+            },
+            "ValidationError": {
+                "properties": {
+                    "loc": {
+                        "items": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                }
+                            ]
+                        },
+                        "type": "array",
+                        "title": "Location"
+                    },
+                    "msg": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "type": {
+                        "type": "string",
+                        "title": "Error Type"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "title": "ValidationError"
+            }
+        },
+        "securitySchemes": {
+            "HTTPBasic": {
+                "type": "http",
+                "scheme": "basic"
+            }
+        }
+    }
+}
