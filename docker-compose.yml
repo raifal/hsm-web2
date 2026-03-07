@@ -1,0 +1,21 @@
+services:
+  mock-api:
+    build:
+      context: ./mock-api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+
+  web:
+    build:
+      context: .
+      dockerfile: web-app/Dockerfile
+      args:
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
+        BUILD_TIMESTAMP: ${BUILD_TIMESTAMP:-unknown}
+    depends_on:
+      - mock-api
+    ports:
+      - "4200:80"
+    volumes:
+      - ${HSM_PROPERTIES_FILE:-./external-interface/hsm-web.properties}:/usr/share/nginx/html/assets/hsm-web.properties:ro

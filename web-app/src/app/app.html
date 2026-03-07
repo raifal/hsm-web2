@@ -1,0 +1,25 @@
+<div class="layout-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo-mark" aria-hidden="true">HSM</div>
+      <div class="brand-copy">
+        <div class="brand-title">Heat Sensor Monitor</div>
+        <div class="brand-subtitle">Operations Console</div>
+      </div>
+    </div>
+
+    <nav class="main-nav" aria-label="Hauptnavigation">
+      <a routerLink="/temperaturen" routerLinkActive="active" class="nav-item">Temperaturen</a>
+      <a routerLink="/sensor-admin" routerLinkActive="active" class="nav-item">Sensor Administration</a>
+    </nav>
+
+    <footer class="meta-footer">
+      <p>Git Commit: {{ configService.buildInfo.gitCommit }}</p>
+      <p>Build: {{ configService.buildInfo.buildTimestamp }}</p>
+    </footer>
+  </aside>
+
+  <main class="content-area">
+    <router-outlet />
+  </main>
+</div>

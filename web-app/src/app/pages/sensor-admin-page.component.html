@@ -1,0 +1,77 @@
+<section class="page-card">
+  <header class="page-header">
+    <h1>Sensor Administration</h1>
+    <button type="button" (click)="reloadSensors()" [disabled]="loading">Neu laden</button>
+  </header>
+
+  @if (errorMessage) {
+    <p class="error-box">{{ errorMessage }}</p>
+  }
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Sensor Address</th>
+          <th>Name</th>
+          <th>Gruppe</th>
+          <th>Farbe</th>
+          <th>Aktiv</th>
+          <th>Aktionen</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (sensor of sensors; track sensor._originalAddress) {
+          <tr>
+            <td><input [(ngModel)]="sensor.sensorAddress" /></td>
+            <td><input [(ngModel)]="sensor.name" /></td>
+            <td><input [(ngModel)]="sensor.groupName" /></td>
+            <td>
+              <div class="color-cell">
+                <input type="color" [(ngModel)]="sensor.color" />
+                <input [(ngModel)]="sensor.color" />
+              </div>
+            </td>
+            <td>
+              <label class="switch-wrap">
+                <input type="checkbox" [(ngModel)]="sensor.active" />
+                Aktiv
+              </label>
+            </td>
+            <td class="action-cell">
+              <button type="button" class="ghost" (click)="saveSensor(sensor)">Speichern</button>
+              <button type="button" class="danger" (click)="deleteSensor(sensor)">Loeschen</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="new-sensor-box">
+    <h2>Neuen Sensor hinzufuegen</h2>
+    <div class="new-sensor-grid">
+      <label>
+        Sensor Address
+        <input [(ngModel)]="newSensor.sensorAddress" placeholder="28-xxxx" />
+      </label>
+      <label>
+        Name
+        <input [(ngModel)]="newSensor.name" />
+      </label>
+      <label>
+        Gruppe
+        <input [(ngModel)]="newSensor.groupName" />
+      </label>
+      <label>
+        Farbe
+        <input type="color" [(ngModel)]="newSensor.color" />
+      </label>
+      <label>
+        Aktiv
+        <input type="checkbox" [(ngModel)]="newSensor.active" />
+      </label>
+    </div>
+    <button type="button" class="primary" (click)="addSensor()">Sensor anlegen</button>
+  </div>
+</section>
