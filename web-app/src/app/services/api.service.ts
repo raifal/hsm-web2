@@ -43,10 +43,8 @@ export class ApiService {
   }
 
   private url(path: string): string {
-    const config = this.runtimeConfigService.config;
-    // In mock mode, route via the web container reverse proxy to avoid browser cross-origin issues.
-    const baseUrl = config.useMockApi ? '' : config.apiBaseUrl;
-    return `${baseUrl.replace(/\/$/, '')}${path}`;
+    // Always use same-origin API paths. The web container proxy forwards '/api' to the configured backend.
+    return path;
   }
 
   private headers(): HttpHeaders {

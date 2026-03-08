@@ -21,8 +21,10 @@ basicAuth.username=
 basicAuth.password=
 ```
 
+`apiBaseUrl` sollte auf den Backend-Host zeigen (z. B. `http://backend:8000`, ohne `/api`).
+
 - `useMockApi=true`: Frontend verwendet den Mock Service ueber denselben Origin (`/api` via Nginx-Proxy)
-- `useMockApi=false`: Frontend verwendet `apiBaseUrl` und optional Basic Auth
+- `useMockApi=false`: Frontend verwendet weiterhin `/api` (same-origin), Nginx proxyt intern auf `apiBaseUrl` und optional Basic Auth wird mitgesendet
 
 ## Start mit Docker Compose
 
@@ -41,7 +43,10 @@ Mock API:
 
 Hinweis:
 
-- Fuer das Frontend wird der Mock bei `useMockApi=true` intern ueber `http://localhost:4200/api/...` geroutet.
+- Der Browser spricht immer nur mit `http://localhost:4200/api/...`.
+- Das Angular-Web-Container-Nginx routed `/api` intern weiter:
+	- bei `useMockApi=true` nach `http://mock-api:8000`
+	- bei `useMockApi=false` nach `apiBaseUrl`
 
 ### Andere Property-Datei verwenden
 
