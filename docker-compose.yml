@@ -5,6 +5,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    networks:
+      - hsm-network
 
   web:
     build:
@@ -19,3 +21,10 @@ services:
       - "4200:80"
     volumes:
       - ${HSM_PROPERTIES_FILE:-./external-interface/hsm-web.properties}:/usr/share/nginx/html/assets/hsm-web.properties:ro
+    networks:
+      - hsm-network
+
+networks:
+  hsm-network:
+    external: true
+    name: hsm-network
