@@ -15,6 +15,8 @@ import { ApiService } from '../services/api.service';
   styleUrl: './temperatures-page.component.scss'
 })
 export class TemperaturesPageComponent implements OnInit {
+  private readonly sensorSelectionStorageKey = 'temperatures.selectedSensors';
+
   selectedDate = this.todayIsoDate();
   activeSensors: SensorRead[] = [];
   selectedSensors: Record<string, boolean> = {};
@@ -67,6 +69,7 @@ export class TemperaturesPageComponent implements OnInit {
   }
 
   onSensorSelectionChanged(): void {
+    this.saveSensorSelection();
     this.rebuildChart();
   }
 
@@ -81,12 +84,14 @@ export class TemperaturesPageComponent implements OnInit {
       next: ({ sensors, measurements }) => {
         this.activeSensors = sensors.filter((sensor) => sensor.active);
         this.measurementsBySensor = measurements;
+        const persistedSelection = this.loadSensorSelection();
 
         for (const sensor of this.activeSensors) {
-          if (this.selectedSensors[sensor.sensorAddress] === undefined) {
-            this.selectedSensors[sensor.sensorAddress] = true;
-          }
+          const persistedValue = persistedSelection[sensor.sensorAddress];
+          this.selectedSensors[sensor.sensorAddress] = persistedValue ?? true;
         }
+
+        this.saveSensorSelection();
 
         this.rebuildChart();
         this.loading = false;
@@ -166,7 +171,7 @@ export class TemperaturesPageComponent implements OnInit {
       return sensorAddress;
     }
 
-    return sensor.name?.trim() ? `${sensor.name} (${sensor.sensorAddress})` : sensor.sensorAddress;
+    return sensor.name?.trim() ? sensor.name : sensor.sensorAddress;
   }
 
   private todayIsoDate(): string {
@@ -193,6 +198,45 @@ export class TemperaturesPageComponent implements OnInit {
     labels.push('24:00');
 
     return labels;
+  }
+
+  private loadSensorSelection(): Record<string, boolean> {
+    try {
+      const raw = localStorage.getItem(this.sensorSelectionStorageKey);
+      if (!raw) {
+        return {};
+      }
+
+      const parsed: unknown = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object') {
+        return {};
+      }
+
+      return Object.entries(parsed).reduce<Record<string, boolean>>((accumulator, [key, value]) => {
+        if (typeof value === 'boolean') {
+          accumulator[key] = value;
+        }
+        return accumulator;
+      }, {});
+    } catch {
+      return {};
+    }
+  }
+
+  private saveSensorSelection(): void {
+    try {
+      const selectionForActiveSensors = this.activeSensors.reduce<Record<string, boolean>>(
+        (accumulator, sensor) => {
+          accumulator[sensor.sensorAddress] = this.selectedSensors[sensor.sensorAddress] ?? true;
+          return accumulator;
+        },
+        {}
+      );
+
+      localStorage.setItem(this.sensorSelectionStorageKey, JSON.stringify(selectionForActiveSensors));
+    } catch {
+      // Ignore storage errors, e.g. privacy mode.
+    }
   }
 }
 
