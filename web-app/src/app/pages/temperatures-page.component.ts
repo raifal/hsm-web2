@@ -157,9 +157,11 @@ export class TemperaturesPageComponent implements OnInit {
           data: labels.map((label) => valueByLabel.get(label) ?? null),
           borderColor: color,
           backgroundColor: `${color}44`,
+          showLine: true,
+          spanGaps: true,
           tension: 0.2,
-          pointRadius: 2,
-          borderWidth: 2
+          pointRadius: 1,
+          borderWidth: 1
         };
       })
     };
