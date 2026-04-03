@@ -116,7 +116,7 @@ export class TemperaturesPageComponent implements OnInit {
   }
 
   private rebuildChart(): void {
-    const labelsSet = new Set<string>();
+    const labels = this.dayLabels();
 
     const selectedSensorAddresses = this.activeSensors
       .filter((sensor) => this.selectedSensors[sensor.sensorAddress])
@@ -134,15 +134,12 @@ export class TemperaturesPageComponent implements OnInit {
         );
         for (const measurement of sortedMeasurements) {
           const label = this.timeLabel(measurement.timestamp);
-          labelsSet.add(label);
           valueByLabel.set(label, measurement.temperature);
         }
       }
 
       mapBySensor.set(sensorAddress, valueByLabel);
     }
-
-    const labels = Array.from(labelsSet).sort();
 
     this.lineChartData = {
       labels,
@@ -182,6 +179,20 @@ export class TemperaturesPageComponent implements OnInit {
       hour: '2-digit',
       minute: '2-digit'
     });
+  }
+
+  private dayLabels(): string[] {
+    const labels: string[] = [];
+
+    for (let minuteOfDay = 0; minuteOfDay < 24 * 60; minuteOfDay++) {
+      const hour = Math.floor(minuteOfDay / 60);
+      const minute = minuteOfDay % 60;
+      labels.push(`${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`);
+    }
+
+    labels.push('24:00');
+
+    return labels;
   }
 }
 
