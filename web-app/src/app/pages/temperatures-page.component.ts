@@ -33,6 +33,7 @@ export class TemperaturesPageComponent implements OnInit {
   lineChartOptions: ChartConfiguration<'line'>['options'] = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: false,
     plugins: {
       legend: {
         position: 'bottom'
