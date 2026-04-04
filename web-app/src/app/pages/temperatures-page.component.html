@@ -1,10 +1,18 @@
 <section class="page-card">
   <header class="page-header">
     <h1>Temperaturen</h1>
-    <label class="date-picker-label">
-      Tag auswaehlen
-      <input type="date" [(ngModel)]="selectedDate" (change)="onDateChanged()" />
-    </label>
+    <div class="date-picker-controls">
+      <button (click)="previousDay()" class="date-btn" title="Einen Tag zurück">⬅ Zurück</button>
+      <button (click)="goToToday()" class="date-btn date-btn-today" title="Gehe zu heute">📅 Heute</button>
+      <button (click)="nextDay()" [disabled]="isMaxDateReached()" class="date-btn" title="Einen Tag vorwärts">Vorwärts ➡</button>
+      <input 
+        type="date" 
+        [(ngModel)]="selectedDate" 
+        (change)="onDateChanged()" 
+        [max]="todayIsoDate()"
+        class="date-input"
+      />
+    </div>
   </header>
 
   @if (errorMessage) {

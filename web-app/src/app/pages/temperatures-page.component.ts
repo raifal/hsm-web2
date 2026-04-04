@@ -73,6 +73,32 @@ export class TemperaturesPageComponent implements OnInit {
     this.rebuildChart();
   }
 
+  previousDay(): void {
+    const date = new Date(this.selectedDate);
+    date.setDate(date.getDate() - 1);
+    this.selectedDate = date.toISOString().slice(0, 10);
+    this.onDateChanged();
+  }
+
+  nextDay(): void {
+    if (this.isMaxDateReached()) {
+      return;
+    }
+    const date = new Date(this.selectedDate);
+    date.setDate(date.getDate() + 1);
+    this.selectedDate = date.toISOString().slice(0, 10);
+    this.onDateChanged();
+  }
+
+  goToToday(): void {
+    this.selectedDate = this.todayIsoDate();
+    this.onDateChanged();
+  }
+
+  isMaxDateReached(): boolean {
+    return this.selectedDate >= this.todayIsoDate();
+  }
+
   private loadPageData(): void {
     this.loading = true;
     this.errorMessage = '';
@@ -176,7 +202,7 @@ export class TemperaturesPageComponent implements OnInit {
     return sensor.name?.trim() ? sensor.name : sensor.sensorAddress;
   }
 
-  private todayIsoDate(): string {
+  todayIsoDate(): string {
     const date = new Date();
     return date.toISOString().slice(0, 10);
   }

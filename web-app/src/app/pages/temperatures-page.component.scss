@@ -13,7 +13,7 @@
 .page-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
   margin-bottom: 1rem;
   gap: 1rem;
   flex-shrink: 0;
@@ -26,16 +26,56 @@ h2 {
   font-weight: 600;
 }
 
-.date-picker-label {
-  display: grid;
-  gap: 0.3rem;
-  font-size: 0.86rem;
+.date-picker-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
 }
 
-input[type='date'] {
+.date-btn {
+  border: 1px solid #cfbca7;
+  background-color: #fff9f1;
+  color: #1f2b2d;
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 200ms ease, border-color 200ms ease;
+  white-space: nowrap;
+}
+
+.date-btn:hover:not(:disabled) {
+  background-color: #ffe1cf;
+  border-color: #f3b58f;
+}
+
+.date-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.date-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.date-btn-today {
+  background-color: var(--highlight-soft);
+  border-color: #f3b58f;
+  color: #8f3d18;
+}
+
+.date-btn-today:hover {
+  background-color: #ffcfb0;
+}
+
+.date-input {
   border: 1px solid #cfbca7;
   border-radius: 8px;
-  padding: 0.38rem 0.45rem;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.9rem;
+  background-color: #fff;
+  color: #1f2b2d;
 }
 
 .content-grid {
