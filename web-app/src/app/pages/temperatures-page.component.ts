@@ -100,6 +100,7 @@ export class TemperaturesPageComponent implements OnInit {
   }
 
   private loadPageData(): void {
+    console.log('Loading page data..., selectedDate:', this.selectedDate);
     this.loading = true;
     this.errorMessage = '';
 
@@ -108,6 +109,7 @@ export class TemperaturesPageComponent implements OnInit {
       measurements: this.apiService.listMeasurementsByDay(this.selectedDate)
     }).subscribe({
       next: ({ sensors, measurements }) => {
+        console.log('Data loaded successfully. Sensors:', sensors, 'Measurements:', measurements);
         this.activeSensors = sensors.filter((sensor) => sensor.active);
         this.measurementsBySensor = measurements;
         const persistedSelection = this.loadSensorSelection();
@@ -122,9 +124,10 @@ export class TemperaturesPageComponent implements OnInit {
         this.rebuildChart();
         this.loading = false;
       },
-      error: () => {
+      error: (err) => {
+        console.error('Error loading data:', err);
         this.loading = false;
-        this.errorMessage = 'Daten konnten nicht geladen werden.';
+        this.errorMessage = 'Daten konnten nicht geladen werden. Fehler: ' + (err?.message || JSON.stringify(err));
       }
     });
   }

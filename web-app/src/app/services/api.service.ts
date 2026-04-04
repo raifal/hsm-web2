@@ -43,7 +43,8 @@ export class ApiService {
   }
 
   private url(path: string): string {
-    // Always use same-origin API paths. The web container proxy forwards '/api' to the configured backend.
+    // Use relative paths - the Angular dev server proxy will forward to http://localhost:8000
+    console.log('API Request - Path:', path, 'Full URL:', path);
     return path;
   }
 
