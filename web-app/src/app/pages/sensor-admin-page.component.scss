@@ -59,6 +59,20 @@ input[type='color'] {
   padding: 0.2rem;
 }
 
+select {
+  width: 100%;
+  border: 1px solid #cfbca7;
+  border-radius: 8px;
+  padding: 0.38rem 0.45rem;
+  background: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.line-type-select {
+  max-width: 140px;
+}
+
 .color-cell {
   display: grid;
   grid-template-columns: 68px 1fr;
@@ -97,6 +111,23 @@ button.danger {
   background: #fff2f0;
 }
 
+button.delete-icon-btn {
+  background: transparent;
+  border: none;
+  padding: 0.4rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: transform 200ms ease;
+}
+
+button.delete-icon-btn:hover {
+  transform: scale(1.15);
+}
+
+button.delete-icon-btn:active {
+  transform: scale(0.95);
+}
+
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -108,6 +139,20 @@ button:disabled {
   color: #8f2f24;
   border-radius: 10px;
   padding: 0.5rem 0.7rem;
+  margin-bottom: 1rem;
+}
+
+.save-all-section {
+  display: flex;
+  justify-content: flex-end;
+  margin: 1rem 0 1.2rem 0;
+  padding-top: 1rem;
+  border-top: 1px solid #e8ddd0;
+}
+
+.save-all-section button {
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
 }
 
 .new-sensor-box {
@@ -118,7 +163,7 @@ button:disabled {
 
 .new-sensor-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 0.7rem;
   margin-bottom: 0.8rem;
 }

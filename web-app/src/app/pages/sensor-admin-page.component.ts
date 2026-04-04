@@ -7,6 +7,7 @@ import { ApiService } from '../services/api.service';
 
 interface SensorRow extends SensorRead {
   _originalAddress: string;
+  lineType?: 'solid' | 'dotted' | 'dashed';
 }
 
 @Component({
@@ -20,13 +21,24 @@ export class SensorAdminPageComponent implements OnInit {
   sensors: SensorRow[] = [];
   loading = false;
   errorMessage = '';
+  saving = false;
 
-  newSensor: SensorRead = {
+  private readonly lineTypeStorageKey = 'sensor-admin.lineTypes';
+
+  lineTypes = [
+    { value: 'solid', label: 'Durchgehend' },
+    { value: 'dotted', label: 'Gepunktet' },
+    { value: 'dashed', label: 'Gestrichelt' }
+  ];
+
+  newSensor: SensorRow = {
     sensorAddress: '',
     active: true,
     color: '#f26a2e',
     name: '',
-    groupName: ''
+    groupName: '',
+    lineType: 'solid',
+    _originalAddress: ''
   };
 
   constructor(private readonly apiService: ApiService) {}
@@ -46,8 +58,10 @@ export class SensorAdminPageComponent implements OnInit {
         next: (sensors) => {
           this.sensors = sensors.map((sensor) => ({
             ...sensor,
+            lineType: sensor.lineType || 'solid' as const,
             _originalAddress: sensor.sensorAddress
           }));
+          this.loadLineTypes();
         },
         error: () => {
           this.errorMessage = 'Sensoren konnten nicht geladen werden.';
@@ -55,45 +69,70 @@ export class SensorAdminPageComponent implements OnInit {
       });
   }
 
-  saveSensor(sensor: SensorRow): void {
-    if (!sensor.sensorAddress.trim()) {
-      this.errorMessage = 'SensorAddress darf nicht leer sein.';
-      return;
-    }
-
+  saveAllSensors(): void {
+    this.saving = true;
     this.errorMessage = '';
-    this.apiService
-      .updateSensor(sensor._originalAddress, {
-        sensorAddress: sensor.sensorAddress.trim(),
-        active: sensor.active,
-        color: sensor.color,
-        name: sensor.name,
-        groupName: sensor.groupName
-      })
-      .subscribe({
-        next: (saved) => {
-          sensor._originalAddress = saved.sensorAddress;
-          sensor.sensorAddress = saved.sensorAddress;
-          sensor.name = saved.name;
-          sensor.groupName = saved.groupName;
-          sensor.color = saved.color;
-          sensor.active = saved.active;
-        },
-        error: () => {
-          this.errorMessage = `Sensor ${sensor._originalAddress} konnte nicht gespeichert werden.`;
-          this.reloadSensors();
-        }
+    let savedCount = 0;
+    let errorCount = 0;
+
+    const savePromises = this.sensors.map((sensor) => {
+      if (!sensor.sensorAddress.trim()) {
+        errorCount++;
+        return Promise.resolve();
+      }
+
+      return new Promise<void>((resolve) => {
+        this.apiService
+          .updateSensor(sensor._originalAddress, {
+            sensorAddress: sensor.sensorAddress.trim(),
+            active: sensor.active,
+            color: sensor.color,
+            name: sensor.name,
+            groupName: sensor.groupName,
+            lineType: sensor.lineType || 'solid'
+          })
+          .subscribe({
+            next: (saved) => {
+              sensor._originalAddress = saved.sensorAddress;
+              sensor.sensorAddress = saved.sensorAddress;
+              sensor.name = saved.name;
+              sensor.groupName = saved.groupName;
+              sensor.color = saved.color;
+              sensor.active = saved.active;
+              sensor.lineType = saved.lineType || 'solid';
+              savedCount++;
+              resolve();
+            },
+            error: () => {
+              errorCount++;
+              resolve();
+            }
+          });
       });
+    });
+
+    Promise.all(savePromises).then(() => {
+      this.saving = false;
+      if (errorCount === 0) {
+        this.errorMessage = `${savedCount} Sensor(en) erfolgreich gespeichert.`;
+      } else {
+        this.errorMessage = `${savedCount} gespeichert, ${errorCount} Fehler.`;
+      }
+    });
   }
 
   deleteSensor(sensor: SensorRow): void {
+    if (!confirm(`Sensor "${sensor.name || sensor.sensorAddress}" wirklich löschen?`)) {
+      return;
+    }
+
     this.errorMessage = '';
     this.apiService.deleteSensor(sensor._originalAddress).subscribe({
       next: () => {
         this.sensors = this.sensors.filter((item) => item._originalAddress !== sensor._originalAddress);
       },
       error: () => {
-        this.errorMessage = `Sensor ${sensor._originalAddress} konnte nicht geloescht werden.`;
+        this.errorMessage = `Sensor ${sensor._originalAddress} konnte nicht gelöscht werden.`;
       }
     });
   }
@@ -111,7 +150,8 @@ export class SensorAdminPageComponent implements OnInit {
         active: this.newSensor.active,
         color: this.newSensor.color,
         name: this.newSensor.name,
-        groupName: this.newSensor.groupName
+        groupName: this.newSensor.groupName,
+        lineType: this.newSensor.lineType || 'solid'
       })
       .subscribe({
         next: (created) => {
@@ -119,20 +159,50 @@ export class SensorAdminPageComponent implements OnInit {
             ...this.sensors,
             {
               ...created,
+              lineType: created.lineType || 'solid',
               _originalAddress: created.sensorAddress
             }
           ];
+          this.saveLineTypes();
           this.newSensor = {
             sensorAddress: '',
             active: true,
             color: '#f26a2e',
             name: '',
-            groupName: ''
+            groupName: '',
+            lineType: 'solid',
+            _originalAddress: ''
           };
         },
         error: () => {
           this.errorMessage = 'Sensor konnte nicht angelegt werden.';
         }
       });
+  }
+
+  onLineTypeChanged(): void {
+    this.saveLineTypes();
+  }
+
+  private saveLineTypes(): void {
+    const lineTypes: Record<string, 'solid' | 'dotted' | 'dashed'> = {};
+    for (const sensor of this.sensors) {
+      lineTypes[sensor.sensorAddress] = sensor.lineType || 'solid';
+    }
+    localStorage.setItem(this.lineTypeStorageKey, JSON.stringify(lineTypes));
+  }
+
+  private loadLineTypes(): void {
+    try {
+      const stored = localStorage.getItem(this.lineTypeStorageKey);
+      if (stored) {
+        const lineTypes = JSON.parse(stored) as Record<string, 'solid' | 'dotted' | 'dashed'>;
+        for (const sensor of this.sensors) {
+          sensor.lineType = lineTypes[sensor.sensorAddress] || 'solid';
+        }
+      }
+    } catch {
+      console.error('Error loading line types from localStorage');
+    }
   }
 }

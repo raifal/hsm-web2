@@ -1,7 +1,7 @@
 <section class="page-card">
   <header class="page-header">
     <h1>Sensor Administration</h1>
-    <button type="button" (click)="reloadSensors()" [disabled]="loading">Neu laden</button>
+    <button type="button" (click)="reloadSensors()" [disabled]="loading || saving">Neu laden</button>
   </header>
 
   @if (errorMessage) {
@@ -16,6 +16,7 @@
           <th>Name</th>
           <th>Gruppe</th>
           <th>Farbe</th>
+          <th>Linientyp</th>
           <th>Aktiv</th>
           <th>Aktionen</th>
         </tr>
@@ -33,19 +34,42 @@
               </div>
             </td>
             <td>
+              <select [(ngModel)]="sensor.lineType" (change)="onLineTypeChanged()" class="line-type-select">
+                @for (lineType of lineTypes; track lineType.value) {
+                  <option [value]="lineType.value">{{ lineType.label }}</option>
+                }
+              </select>
+            </td>
+            <td>
               <label class="switch-wrap">
                 <input type="checkbox" [(ngModel)]="sensor.active" />
                 Aktiv
               </label>
             </td>
             <td class="action-cell">
-              <button type="button" class="ghost" (click)="saveSensor(sensor)">Speichern</button>
-              <button type="button" class="danger" (click)="deleteSensor(sensor)">Loeschen</button>
+              <button 
+                type="button" 
+                class="delete-icon-btn"
+                (click)="deleteSensor(sensor)"
+                title="Sensor löschen"
+                aria-label="Sensor löschen">
+                ❌
+              </button>
             </td>
           </tr>
         }
       </tbody>
     </table>
+  </div>
+
+  <div class="save-all-section">
+    <button type="button" class="primary" (click)="saveAllSensors()" [disabled]="loading || saving || sensors.length === 0">
+      @if (saving) {
+        Speichern...
+      } @else {
+        Alle Sensoren speichern
+      }
+    </button>
   </div>
 
   <div class="new-sensor-box">
@@ -66,6 +90,14 @@
       <label>
         Farbe
         <input type="color" [(ngModel)]="newSensor.color" />
+      </label>
+      <label>
+        Linientyp
+        <select [(ngModel)]="newSensor.lineType" (change)="onLineTypeChanged()" class="line-type-select">
+          @for (lineType of lineTypes; track lineType.value) {
+            <option [value]="lineType.value">{{ lineType.label }}</option>
+          }
+        </select>
       </label>
       <label>
         Aktiv

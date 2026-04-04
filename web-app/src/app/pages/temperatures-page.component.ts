@@ -16,6 +16,7 @@ import { ApiService } from '../services/api.service';
 })
 export class TemperaturesPageComponent implements OnInit {
   private readonly sensorSelectionStorageKey = 'temperatures.selectedSensors';
+  private readonly lineTypeStorageKey = 'sensor-admin.lineTypes';
 
   selectedDate = this.todayIsoDate();
   activeSensors: SensorRead[] = [];
@@ -179,9 +180,12 @@ export class TemperaturesPageComponent implements OnInit {
     this.lineChartData = {
       labels,
       datasets: selectedSensorAddresses.map((sensorAddress) => {
-        const color =
-          this.activeSensors.find((sensor) => sensor.sensorAddress === sensorAddress)?.color || '#f26a2e';
+        const sensor = this.activeSensors.find((s) => s.sensorAddress === sensorAddress);
+        const color = sensor?.color || '#f26a2e';
         const valueByLabel = mapBySensor.get(sensorAddress) ?? new Map<string, number>();
+        const lineType = sensor?.lineType || this.getLineTypesMap()[sensorAddress] || 'solid';
+        const borderDash = this.getLineDash(lineType);
+
         return {
           label: this.sensorDisplayName(sensorAddress),
           data: labels.map((label) => valueByLabel.get(label) ?? null),
@@ -191,7 +195,8 @@ export class TemperaturesPageComponent implements OnInit {
           spanGaps: true,
           tension: 0.2,
           pointRadius: 1,
-          borderWidth: 1
+          borderWidth: 1,
+          borderDash
         };
       })
     };
@@ -204,6 +209,30 @@ export class TemperaturesPageComponent implements OnInit {
     }
 
     return sensor.name?.trim() ? sensor.name : sensor.sensorAddress;
+  }
+
+  private getLineTypesMap(): Record<string, 'solid' | 'dotted' | 'dashed'> {
+    try {
+      const stored = localStorage.getItem(this.lineTypeStorageKey);
+      if (stored) {
+        return JSON.parse(stored) as Record<string, 'solid' | 'dotted' | 'dashed'>;
+      }
+    } catch {
+      console.error('Error loading line types from localStorage');
+    }
+    return {};
+  }
+
+  private getLineDash(lineType: 'solid' | 'dotted' | 'dashed'): number[] {
+    switch (lineType) {
+      case 'dotted':
+        return [2, 3];
+      case 'dashed':
+        return [5, 5];
+      case 'solid':
+      default:
+        return [];
+    }
   }
 
   todayIsoDate(): string {

@@ -590,6 +590,11 @@
                         "type": "string",
                         "title": "Groupname",
                         "default": ""
+                    },
+                    "lineType": {
+                        "type": "string",
+                        "title": "Linetype",
+                        "default": "solid"
                     }
                 },
                 "type": "object",
@@ -644,6 +649,11 @@
                         "type": "string",
                         "title": "Groupname",
                         "default": ""
+                    },
+                    "lineType": {
+                        "type": "string",
+                        "title": "Linetype",
+                        "default": "solid"
                     }
                 },
                 "type": "object",

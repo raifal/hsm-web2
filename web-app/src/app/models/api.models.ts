@@ -4,6 +4,7 @@ export interface SensorRead {
   color: string;
   name: string;
   groupName: string;
+  lineType?: 'solid' | 'dotted' | 'dashed';
 }
 
 export interface SensorCreate {
@@ -12,6 +13,7 @@ export interface SensorCreate {
   color?: string;
   name?: string;
   groupName?: string;
+  lineType?: 'solid' | 'dotted' | 'dashed';
 }
 
 export interface MeasurementItem {
