@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Chart, ChartConfiguration, ChartData, registerables } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
@@ -15,6 +15,8 @@ import { ApiService } from '../services/api.service';
   styleUrl: './temperatures-page.component.scss'
 })
 export class TemperaturesPageComponent implements OnInit {
+  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
+
   private readonly sensorSelectionStorageKey = 'temperatures.selectedSensors';
   private readonly lineTypeStorageKey = 'sensor-admin.lineTypes';
 
@@ -99,6 +101,20 @@ export class TemperaturesPageComponent implements OnInit {
 
   isMaxDateReached(): boolean {
     return this.selectedDate >= this.todayIsoDate();
+  }
+
+  exportAsImage(): void {
+    const canvas = this.chart?.chart?.canvas;
+    if (!canvas) {
+      return;
+    }
+    const dataUrl = canvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = `temperaturen-${this.selectedDate}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 
   private loadPageData(): void {
