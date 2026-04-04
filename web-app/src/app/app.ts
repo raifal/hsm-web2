@@ -9,5 +9,11 @@ import { RuntimeConfigService } from './services/runtime-config.service';
   styleUrl: './app.scss'
 })
 export class App {
+  sidebarCollapsed = true;
+
   constructor(public readonly configService: RuntimeConfigService) {}
+
+  toggleSidebar(): void {
+    this.sidebarCollapsed = !this.sidebarCollapsed;
+  }
 }

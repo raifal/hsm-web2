@@ -28,6 +28,33 @@
 	display: grid;
 	grid-template-columns: 300px 1fr;
 	animation: shell-enter 500ms ease-out;
+	transition: grid-template-columns 300ms ease;
+}
+
+.layout-shell.sidebar-collapsed {
+	grid-template-columns: 70px 1fr;
+
+	.sidebar {
+		padding: 1rem 0.5rem;
+	}
+
+	.brand-copy {
+		display: none;
+	}
+
+	.nav-item {
+		padding: 0.65rem;
+		border-radius: 8px;
+		justify-content: center;
+	}
+
+	.nav-label {
+		display: none;
+	}
+
+	.meta-footer {
+		display: none;
+	}
 }
 
 .sidebar {
@@ -85,6 +112,22 @@
 	padding: 0.65rem 0.75rem;
 	font-weight: 600;
 	transition: transform 220ms ease, border-color 220ms ease, background-color 220ms ease;
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.nav-icon {
+	font-size: 1.2rem;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: 1.5rem;
+}
+
+.nav-label {
+	white-space: nowrap;
 }
 
 .nav-item:hover {
@@ -112,6 +155,39 @@
 
 .content-area {
 	padding: 1.5rem;
+	position: relative;
+}
+
+.sidebar-toggle {
+	position: absolute;
+	top: 1rem;
+	left: 1rem;
+	z-index: 10;
+	width: 44px;
+	height: 44px;
+	border: none;
+	border-radius: 8px;
+	background-color: var(--panel);
+	border: 1px solid var(--border);
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1.5rem;
+	transition: background-color 200ms ease, border-color 200ms ease;
+
+	&:hover {
+		background-color: var(--bg-accent);
+		border-color: var(--highlight);
+	}
+
+	&:active {
+		transform: scale(0.95);
+	}
+
+	.toggle-icon {
+		display: inline-block;
+	}
 }
 
 @keyframes shell-enter {

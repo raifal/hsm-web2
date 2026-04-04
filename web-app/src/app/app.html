@@ -1,4 +1,4 @@
-<div class="layout-shell">
+<div class="layout-shell" [class.sidebar-collapsed]="sidebarCollapsed">
   <aside class="sidebar">
     <div class="brand">
       <div class="logo-mark" aria-hidden="true">HSM</div>
@@ -9,8 +9,14 @@
     </div>
 
     <nav class="main-nav" aria-label="Hauptnavigation">
-      <a routerLink="/temperaturen" routerLinkActive="active" class="nav-item">Temperaturen</a>
-      <a routerLink="/sensor-admin" routerLinkActive="active" class="nav-item">Sensor Administration</a>
+      <a routerLink="/temperaturen" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">🌡️</span>
+        <span class="nav-label">Temperaturen</span>
+      </a>
+      <a routerLink="/sensor-admin" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-label">Sensor Administration</span>
+      </a>
     </nav>
 
     <footer class="meta-footer">
@@ -20,6 +26,11 @@
   </aside>
 
   <main class="content-area">
+    <button class="sidebar-toggle" (click)="toggleSidebar()" 
+            [attr.aria-label]="sidebarCollapsed ? 'Menü öffnen' : 'Menü schließen'"
+            [attr.title]="sidebarCollapsed ? 'Menü öffnen' : 'Menü schließen'">
+      <span class="toggle-icon">☰</span>
+    </button>
     <router-outlet />
   </main>
 </div>
