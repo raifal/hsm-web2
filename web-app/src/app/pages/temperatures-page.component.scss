@@ -3,6 +3,11 @@
   border: 1px solid #ddcfbf;
   border-radius: 16px;
   padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  height: 90vh;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .page-header {
@@ -11,6 +16,7 @@
   align-items: flex-end;
   margin-bottom: 1rem;
   gap: 1rem;
+  flex-shrink: 0;
 }
 
 h1,
@@ -36,6 +42,8 @@ input[type='date'] {
   display: grid;
   grid-template-columns: minmax(220px, 280px) 1fr;
   gap: 1rem;
+  flex: 1;
+  min-height: 0;
 }
 
 .sensor-list-panel {
@@ -43,6 +51,10 @@ input[type='date'] {
   background: #fff9f1;
   border-radius: 12px;
   padding: 0.8rem;
+  max-height: 30vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .sensor-list {
@@ -70,10 +82,14 @@ input[type='date'] {
   background: #fff;
   border-radius: 12px;
   padding: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .chart-wrap {
-  height: 420px;
+  flex: 1;
+  min-height: 0;
 }
 
 .error-box {
@@ -90,7 +106,12 @@ input[type='date'] {
     grid-template-columns: 1fr;
   }
 
+  .sensor-list-panel {
+    max-height: none;
+    min-height: 150px;
+  }
+
   .chart-wrap {
-    height: 300px;
+    min-height: 250px;
   }
 }

@@ -29,6 +29,7 @@
 	grid-template-columns: 300px 1fr;
 	animation: shell-enter 500ms ease-out;
 	transition: grid-template-columns 300ms ease;
+	max-height: 100vh;
 }
 
 .layout-shell.sidebar-collapsed {
@@ -156,6 +157,9 @@
 .content-area {
 	padding: 1.5rem;
 	position: relative;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
 }
 
 .sidebar-toggle {
