@@ -1,11 +1,18 @@
 <div class="layout-shell" [class.sidebar-collapsed]="sidebarCollapsed">
   <aside class="sidebar">
-    <div class="brand">
-      <div class="logo-mark" aria-hidden="true">HSM</div>
-      <div class="brand-copy">
-        <div class="brand-title">Heat Sensor Monitor</div>
-        <div class="brand-subtitle">Operations Console</div>
+    <div class="brand-section">
+      <div class="brand">
+        <div class="logo-mark" aria-hidden="true">HSM</div>
+        <div class="brand-copy">
+          <div class="brand-title">Heat Sensor Monitor</div>
+          <div class="brand-subtitle">Operations Console</div>
+        </div>
       </div>
+      <button class="sidebar-toggle-mobile" (click)="toggleSidebar()" 
+              [attr.aria-label]="sidebarCollapsed ? 'Menü öffnen' : 'Menü schließen'"
+              [attr.title]="sidebarCollapsed ? 'Menü öffnen' : 'Menü schließen'">
+        <span class="toggle-icon">☰</span>
+      </button>
     </div>
 
     <nav class="main-nav" aria-label="Hauptnavigation">
@@ -26,11 +33,6 @@
   </aside>
 
   <main class="content-area">
-    <button class="sidebar-toggle" (click)="toggleSidebar()" 
-            [attr.aria-label]="sidebarCollapsed ? 'Menü öffnen' : 'Menü schließen'"
-            [attr.title]="sidebarCollapsed ? 'Menü öffnen' : 'Menü schließen'">
-      <span class="toggle-icon">☰</span>
-    </button>
     <router-outlet />
   </main>
 </div>

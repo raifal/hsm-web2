@@ -26,6 +26,26 @@ basicAuth.password=
 - `useMockApi=true`: Frontend verwendet den Mock Service ueber denselben Origin (`/api` via Nginx-Proxy)
 - `useMockApi=false`: Frontend verwendet weiterhin `/api` (same-origin), Nginx proxyt intern auf `apiBaseUrl` und optional Basic Auth wird mitgesendet
 
+## Start Application
+
+**Terminal 1 - Mock API:**
+```bash
+pushd mock-api
+npm install
+npm start
+popd
+```
+
+**Terminal 2 - Angular Frontend:**
+```bash
+pushd web-app
+npm install
+npx ng serve --proxy-config proxy.conf.json
+popd
+```
+
+Dann öffne `http://localhost:4200/` im Browser.
+
 ## Start mit Docker Compose
 
 ```bash

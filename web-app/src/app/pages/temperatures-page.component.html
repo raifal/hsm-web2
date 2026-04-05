@@ -13,15 +13,23 @@
         class="date-input"
       />
     </div>
+    <button (click)="toggleSensorFilter()" class="settings-btn" title="Sensor-Filter">⚙️</button>
   </header>
 
   @if (errorMessage) {
     <p class="error-box">{{ errorMessage }}</p>
   }
 
+  @if (showSensorFilterModal) {
+    <div class="modal-overlay" (click)="closeSensorFilter()"></div>
+  }
+
   <div class="content-grid">
-    <aside class="sensor-list-panel">
-      <h2>Aktive Sensoren</h2>
+    <aside class="sensor-list-panel" [class.modal-open]="showSensorFilterModal">
+      <div class="sensor-list-header">
+        <h2>Aktive Sensoren</h2>
+        <button (click)="closeSensorFilter()" class="close-modal-btn" title="Schließen">✕</button>
+      </div>
       @if (activeSensors.length === 0) {
         <p>Keine aktiven Sensoren gefunden.</p>
       }

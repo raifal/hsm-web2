@@ -67,6 +67,12 @@
 	gap: 1.5rem;
 }
 
+.brand-section {
+	display: flex;
+	flex-direction: column;
+	gap: 0.8rem;
+}
+
 .brand {
 	display: flex;
 	gap: 0.8rem;
@@ -162,22 +168,19 @@
 	overflow: hidden;
 }
 
-.sidebar-toggle {
-	position: absolute;
-	top: 1rem;
-	left: 1rem;
-	z-index: 10;
-	width: 44px;
-	height: 44px;
+.sidebar-toggle-mobile {
+	display: none;
+	width: 40px;
+	height: 40px;
 	border: none;
 	border-radius: 8px;
 	background-color: var(--panel);
 	border: 1px solid var(--border);
 	cursor: pointer;
-	display: flex;
 	align-items: center;
 	justify-content: center;
-	font-size: 1.5rem;
+	font-size: 1.3rem;
+	flex-shrink: 0;
 	transition: background-color 200ms ease, border-color 200ms ease;
 
 	&:hover {
@@ -191,6 +194,12 @@
 
 	.toggle-icon {
 		display: inline-block;
+	}
+}
+
+@media (max-width: 900px) {
+	.sidebar-toggle-mobile {
+		display: flex;
 	}
 }
 

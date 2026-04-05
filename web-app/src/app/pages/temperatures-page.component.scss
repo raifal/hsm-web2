@@ -5,7 +5,8 @@
   padding: 1.2rem;
   display: flex;
   flex-direction: column;
-  height: 90vh;
+  height: 100%;
+  min-height: 90vh;
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -139,17 +140,185 @@ h2 {
   margin-bottom: 0.8rem;
 }
 
+.settings-btn {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  transition: background-color 200ms ease;
+
+  &:hover {
+    background-color: #f0ede8;
+  }
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.sensor-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.close-modal-btn {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  transition: color 200ms ease;
+
+  &:hover {
+    color: #8f3d18;
+  }
+}
+
 @media (max-width: 900px) {
+  .page-header {
+    flex-wrap: wrap;
+    margin-bottom: 0.8rem;
+  }
+
+  .date-picker-controls {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .settings-btn {
+    display: block;
+    flex-shrink: 0;
+  }
+
   .content-grid {
     grid-template-columns: 1fr;
+    position: relative;
+    flex: 1;
+    min-height: 0;
   }
 
   .sensor-list-panel {
-    max-height: none;
-    min-height: 150px;
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    border: none;
+    border-radius: 0;
+    padding: 1.2rem;
+    background: #fffdf8;
+    overflow-y: auto;
+    width: 100%;
+    height: 100%;
+
+    &.modal-open {
+      display: flex;
+    }
+  }
+
+  .close-modal-btn {
+    display: block;
+  }
+
+  .modal-overlay {
+    display: block;
+  }
+
+  .chart-panel {
+    min-height: 0;
+    flex: 1;
+    border-radius: 12px;
+    overflow: hidden;
   }
 
   .chart-wrap {
+    flex: 1;
     min-height: 250px;
+    position: relative;
+  }
+}
+
+@media (max-width: 600px) {
+  .page-card {
+    padding: 0.8rem;
+    border-radius: 0;
+    height: 100%;
+    min-height: unset;
+  }
+
+  .page-header {
+    padding: 0;
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+  }
+
+  h1 {
+    font-size: 1.2rem;
+  }
+
+  .date-picker-controls {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.4rem;
+    flex: 1;
+  }
+
+  .date-btn {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.5rem;
+    flex: 1;
+  }
+
+  .date-input {
+    width: 100%;
+    font-size: 0.85rem;
+    padding: 0.35rem 0.5rem;
+  }
+
+  .settings-btn {
+    padding: 0.35rem 0.5rem;
+    font-size: 1rem;
+  }
+
+  .content-grid {
+    flex: 1;
+    min-height: 0;
+    gap: 0.5rem;
+  }
+
+  .chart-panel {
+    padding: 0.6rem;
+    min-height: 0;
+    flex: 1;
+  }
+
+  .chart-wrap {
+    min-height: 0;
+    flex: 1;
+  }
+
+  .error-box {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+    margin-bottom: 0.6rem;
   }
 }

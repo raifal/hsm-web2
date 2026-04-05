@@ -24,6 +24,7 @@ export class TemperaturesPageComponent implements OnInit {
   measurementsBySensor: SensorDayMeasurements[] = [];
   errorMessage = '';
   loading = false;
+  showSensorFilterModal = false;
 
   lineChartType: 'line' = 'line';
   lineChartData: ChartData<'line'> = {
@@ -95,6 +96,14 @@ export class TemperaturesPageComponent implements OnInit {
   goToToday(): void {
     this.selectedDate = this.todayIsoDate();
     this.onDateChanged();
+  }
+
+  toggleSensorFilter(): void {
+    this.showSensorFilterModal = !this.showSensorFilterModal;
+  }
+
+  closeSensorFilter(): void {
+    this.showSensorFilterModal = false;
   }
 
   isMaxDateReached(): boolean {
