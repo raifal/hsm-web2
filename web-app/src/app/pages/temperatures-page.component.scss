@@ -124,11 +124,50 @@ h2 {
   display: flex;
   flex-direction: column;
   min-height: 0;
+
+  &.is-loading canvas {
+    opacity: 0.88;
+  }
 }
 
 .chart-wrap {
   flex: 1;
   min-height: 0;
+  position: relative;
+}
+
+.chart-loading-overlay {
+  position: absolute;
+  top: 0.35rem;
+  left: 0.35rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid rgba(207, 188, 167, 0.95);
+  border-radius: 999px;
+  background: rgba(255, 249, 241, 0.96);
+  color: #6f4b34;
+  font-size: 0.78rem;
+  font-weight: 600;
+  box-shadow: 0 2px 10px rgba(31, 43, 45, 0.08);
+  pointer-events: none;
+}
+
+.chart-loading-spinner {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  border: 2px solid rgba(143, 61, 24, 0.18);
+  border-top-color: #f26a2e;
+  animation: chart-spin 0.8s linear infinite;
+}
+
+@keyframes chart-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .error-box {
