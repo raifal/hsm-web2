@@ -178,7 +178,7 @@ export class TemperaturesPageComponent implements OnInit {
           a.timestamp.localeCompare(b.timestamp)
         );
         for (const measurement of sortedMeasurements) {
-          const label = this.timeLabel(measurement.timestamp);
+          const label = this.hourLabel(measurement.timestamp);
           valueByLabel.set(label, measurement.temperature);
         }
       }
@@ -249,23 +249,17 @@ export class TemperaturesPageComponent implements OnInit {
     return date.toISOString().slice(0, 10);
   }
 
-  private timeLabel(isoDateTime: string): string {
-    return new Date(isoDateTime).toLocaleTimeString('de-DE', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+  private hourLabel(isoDateTime: string): string {
+    const hour = new Date(isoDateTime).getHours();
+    return `${hour}h`;
   }
 
   private dayLabels(): string[] {
     const labels: string[] = [];
 
-    for (let minuteOfDay = 0; minuteOfDay < 24 * 60; minuteOfDay++) {
-      const hour = Math.floor(minuteOfDay / 60);
-      const minute = minuteOfDay % 60;
-      labels.push(`${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`);
+    for (let hour = 0; hour <= 24; hour += 1) {
+      labels.push(`${hour}h`);
     }
-
-    labels.push('24:00');
 
     return labels;
   }
