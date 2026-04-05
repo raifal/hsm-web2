@@ -2,9 +2,9 @@
   <header class="page-header">
     <h1>Temperaturen</h1>
     <div class="date-picker-controls">
-      <button (click)="previousDay()" class="date-btn" title="Einen Tag zurück">⬅ Zurück</button>
-      <button (click)="goToToday()" class="date-btn date-btn-today" title="Gehe zu heute">📅 Heute</button>
-      <button (click)="nextDay()" [disabled]="isMaxDateReached()" class="date-btn" title="Einen Tag vorwärts">Vorwärts ➡</button>
+      <button (click)="previousDay()" class="date-btn" title="Einen Tag zurück">⬅</button>
+    <!--  <button (click)="goToToday()" class="date-btn date-btn-today" title="Gehe zu heute">📅</button>
+ -->
       <input 
         type="date" 
         [(ngModel)]="selectedDate" 
@@ -12,6 +12,8 @@
         [max]="todayIsoDate()"
         class="date-input"
       />
+      <button (click)="nextDay()" [disabled]="isMaxDateReached()" class="date-btn" title="Einen Tag vorwärts">➡</button>
+
     </div>
     <button (click)="toggleSensorFilter()" class="settings-btn" title="Sensor-Filter">⚙️</button>
   </header>
