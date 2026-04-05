@@ -53,6 +53,30 @@ export class TemperaturesPageComponent implements OnInit {
         }
       },
       x: {
+        ticks: {
+          autoSkip: false,
+          maxRotation: 0,
+          callback: (_value, index) => {
+            if (typeof index !== 'number') {
+              return '';
+            }
+            const label = this.lineChartData.labels?.[index];
+            if (typeof label !== 'string') {
+              return '';
+            }
+
+            if (label === '24:00') {
+              return '24h';
+            }
+
+            const [hour, minute] = label.split(':');
+            if (minute === '00') {
+              return `${Number(hour)}h`;
+            }
+
+            return '';
+          }
+        },
         title: {
           display: true,
           text: 'Uhrzeit'
@@ -178,7 +202,7 @@ export class TemperaturesPageComponent implements OnInit {
           a.timestamp.localeCompare(b.timestamp)
         );
         for (const measurement of sortedMeasurements) {
-          const label = this.hourLabel(measurement.timestamp);
+          const label = this.timeLabel(measurement.timestamp);
           valueByLabel.set(label, measurement.temperature);
         }
       }
@@ -249,17 +273,23 @@ export class TemperaturesPageComponent implements OnInit {
     return date.toISOString().slice(0, 10);
   }
 
-  private hourLabel(isoDateTime: string): string {
-    const hour = new Date(isoDateTime).getHours();
-    return `${hour}h`;
+  private timeLabel(isoDateTime: string): string {
+    return new Date(isoDateTime).toLocaleTimeString('de-DE', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   }
 
   private dayLabels(): string[] {
     const labels: string[] = [];
 
-    for (let hour = 0; hour <= 24; hour += 1) {
-      labels.push(`${hour}h`);
+    for (let minuteOfDay = 0; minuteOfDay < 24 * 60; minuteOfDay += 1) {
+      const hour = Math.floor(minuteOfDay / 60);
+      const minute = minuteOfDay % 60;
+      labels.push(`${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`);
     }
+
+    labels.push('24:00');
 
     return labels;
   }
