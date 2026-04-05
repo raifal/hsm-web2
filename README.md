@@ -68,13 +68,19 @@ Hinweis:
 	- bei `useMockApi=true` nach `http://mock-api:8000`
 	- bei `useMockApi=false` nach `apiBaseUrl`
 
-### Andere Property-Datei verwenden
+## Screenshots
 
-```bash
-HSM_PROPERTIES_FILE=./external-interface/hsm-web.properties docker compose up --build
-```
+### Web
 
-`HSM_PROPERTIES_FILE` kann auf jede beliebige Property-Datei zeigen.
+![web1](./docs/web1.png)
+
+![web2](./docs/web2.png)
+
+![web3](./docs/web3.png)
+
+### Mobile
+
+![mobile1](./docs/mobile1.png)
 
 ## Features
 
