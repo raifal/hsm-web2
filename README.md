@@ -28,19 +28,19 @@ basicAuth.password=
 
 ## Start Application
 
-**Terminal 1 - Mock API:**
+**Mock API**
 ```bash
 pushd mock-api
 npm install
-npm start
+npm start &
 popd
 ```
 
-**Terminal 2 - Angular Frontend:**
+**Angular Frontend**
 ```bash
 pushd web-app
 npm install
-npx ng serve --proxy-config proxy.conf.json
+npx ng serve --proxy-config proxy.conf.json &
 popd
 ```
 

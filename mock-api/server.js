@@ -13,21 +13,24 @@ let sensors = [
     active: true,
     color: '#f26a2e',
     name: 'Boiler 1',
-    groupName: 'Heizkreis'
+    groupName: 'Heizkreis',
+    lineType: 'solid'
   },
   {
     sensorAddress: '28-0002',
     active: true,
     color: '#4aaa82',
     name: 'Ruecklauf',
-    groupName: 'Heizkreis'
+    groupName: 'Heizkreis',
+    lineType: 'solid'
   },
   {
     sensorAddress: '28-0003',
     active: false,
     color: '#3f8ec9',
     name: 'Aussen',
-    groupName: 'Umgebung'
+    groupName: 'Umgebung',
+    lineType: 'solid'
   }
 ];
 
@@ -56,7 +59,8 @@ app.post('/api/sensors', (req, res) => {
     active: payload.active ?? true,
     color: payload.color ?? '#f26a2e',
     name: payload.name ?? '',
-    groupName: payload.groupName ?? ''
+    groupName: payload.groupName ?? '',
+    lineType: payload.lineType ?? 'solid'
   };
 
   sensors.push(created);
@@ -97,7 +101,8 @@ app.put('/api/sensors/:sensorAddress', (req, res) => {
     active: payload.active ?? true,
     color: payload.color ?? '#f26a2e',
     name: payload.name ?? '',
-    groupName: payload.groupName ?? ''
+    groupName: payload.groupName ?? '',
+    lineType: payload.lineType ?? sensors[index].lineType ?? 'solid'
   };
 
   sensors[index] = updated;

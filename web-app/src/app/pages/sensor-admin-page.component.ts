@@ -92,13 +92,14 @@ export class SensorAdminPageComponent implements OnInit {
           })
           .subscribe({
             next: (saved) => {
+              const persistedLineType = sensor.lineType || 'solid';
               sensor._originalAddress = saved.sensorAddress;
               sensor.sensorAddress = saved.sensorAddress;
               sensor.name = saved.name;
               sensor.groupName = saved.groupName;
               sensor.color = saved.color;
               sensor.active = saved.active;
-              sensor.lineType = saved.lineType || 'solid';
+              sensor.lineType = saved.lineType || persistedLineType;
               savedCount++;
               resolve();
             },
@@ -112,6 +113,7 @@ export class SensorAdminPageComponent implements OnInit {
 
     Promise.all(savePromises).then(() => {
       this.saving = false;
+      this.saveLineTypes();
       if (errorCount === 0) {
         this.errorMessage = `${savedCount} Sensor(en) erfolgreich gespeichert.`;
       } else {
@@ -154,11 +156,12 @@ export class SensorAdminPageComponent implements OnInit {
       })
       .subscribe({
         next: (created) => {
+          const createdLineType = created.lineType || this.newSensor.lineType || 'solid';
           this.sensors = [
             ...this.sensors,
             {
               ...created,
-              lineType: created.lineType || 'solid',
+              lineType: createdLineType,
               _originalAddress: created.sensorAddress
             }
           ];
