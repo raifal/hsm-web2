@@ -7,7 +7,6 @@ import { ApiService } from '../services/api.service';
 
 interface SensorRow extends SensorRead {
   _originalAddress: string;
-  lineType?: 'solid' | 'dotted' | 'dashed';
 }
 
 @Component({
