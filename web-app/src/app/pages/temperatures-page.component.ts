@@ -48,6 +48,7 @@ export class TemperaturesPageComponent implements OnInit {
     scales: {
       y: {
         suggestedMax: 80,
+        suggestedMin: -20,
         title: {
           display: true,
           text: 'Temperatur (C)'
