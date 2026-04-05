@@ -53,6 +53,20 @@ export class TemperaturesPageComponent implements OnInit {
         }
       },
       x: {
+        grid: {
+          color: (context) => {
+            const label = this.lineChartData.labels?.[context.index];
+            if (typeof label !== 'string') {
+              return 'rgba(0, 0, 0, 0)';
+            }
+
+            if (label === '24:00') {
+              return 'rgba(31, 43, 45, 0.16)';
+            }
+
+            return label.endsWith(':00') ? 'rgba(31, 43, 45, 0.16)' : 'rgba(0, 0, 0, 0)';
+          }
+        },
         ticks: {
           autoSkip: false,
           maxRotation: 0,
@@ -227,7 +241,8 @@ export class TemperaturesPageComponent implements OnInit {
           showLine: true,
           spanGaps: true,
           tension: 0.2,
-          pointRadius: 1,
+          pointRadius: 0,
+          pointHoverRadius: 2,
           borderWidth: 1,
           borderDash
         };
