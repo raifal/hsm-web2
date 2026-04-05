@@ -80,7 +80,7 @@ Hinweis:
 
 ### Mobile
 
-![mobile1](./docs/mobile1.png)
+![mobile1](./docs/mobile1.jpg)
 
 ## Features
 
