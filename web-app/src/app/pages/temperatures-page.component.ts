@@ -1,11 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Chart, ChartConfiguration, ChartData, registerables } from 'chart.js';
+import { Chart, ChartConfiguration, ChartData, LegendItem, registerables } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { forkJoin } from 'rxjs';
 import { SensorDayMeasurements, SensorRead } from '../models/api.models';
 import { ApiService } from '../services/api.service';
+
+interface SensorGroup {
+  name: string;
+  sensors: SensorRead[];
+}
 
 @Component({
   selector: 'app-temperatures-page',
@@ -17,14 +22,18 @@ import { ApiService } from '../services/api.service';
 export class TemperaturesPageComponent implements OnInit {
   private readonly sensorSelectionStorageKey = 'temperatures.selectedSensors';
   private readonly lineTypeStorageKey = 'sensor-admin.lineTypes';
+  private readonly ungroupedLabel = 'Ohne Gruppe';
 
   selectedDate = this.todayIsoDate();
   activeSensors: SensorRead[] = [];
+  sensorGroups: SensorGroup[] = [];
   selectedSensors: Record<string, boolean> = {};
   measurementsBySensor: SensorDayMeasurements[] = [];
   errorMessage = '';
   loading = false;
   showSensorFilterModal = false;
+  private datasetGroupNames: string[] = [];
+  private datasetLegendColors: string[] = [];
 
   lineChartType: 'line' = 'line';
   lineChartData: ChartData<'line'> = {
@@ -38,7 +47,13 @@ export class TemperaturesPageComponent implements OnInit {
     animation: false,
     plugins: {
       legend: {
-        position: 'bottom'
+        position: 'bottom',
+        labels: {
+          generateLabels: (chart) => this.buildGroupLegendLabels(chart)
+        },
+        onClick: (_event, legendItem, legend) => {
+          this.toggleGroupDatasets(legend.chart, legendItem.text);
+        }
       }
     },
     interaction: {
@@ -116,6 +131,35 @@ export class TemperaturesPageComponent implements OnInit {
     this.rebuildChart();
   }
 
+  onGroupSelectionChanged(groupName: string, selected: boolean): void {
+    for (const sensor of this.activeSensors) {
+      if (this.sensorGroupName(sensor) === groupName) {
+        this.selectedSensors[sensor.sensorAddress] = selected;
+      }
+    }
+
+    this.onSensorSelectionChanged();
+  }
+
+  isGroupSelected(groupName: string): boolean {
+    const groupSensors = this.activeSensors.filter((sensor) => this.sensorGroupName(sensor) === groupName);
+    if (groupSensors.length === 0) {
+      return false;
+    }
+
+    return groupSensors.every((sensor) => this.selectedSensors[sensor.sensorAddress]);
+  }
+
+  isGroupPartiallySelected(groupName: string): boolean {
+    const groupSensors = this.activeSensors.filter((sensor) => this.sensorGroupName(sensor) === groupName);
+    if (groupSensors.length === 0) {
+      return false;
+    }
+
+    const selectedCount = groupSensors.filter((sensor) => this.selectedSensors[sensor.sensorAddress]).length;
+    return selectedCount > 0 && selectedCount < groupSensors.length;
+  }
+
   previousDay(): void {
     const date = new Date(this.selectedDate);
     date.setDate(date.getDate() - 1);
@@ -162,6 +206,7 @@ export class TemperaturesPageComponent implements OnInit {
       next: ({ sensors, measurements }) => {
         console.log('Data loaded successfully. Sensors:', sensors, 'Measurements:', measurements);
         this.activeSensors = sensors.filter((sensor) => sensor.active);
+        this.sensorGroups = this.buildSensorGroups(this.activeSensors);
         this.measurementsBySensor = measurements;
         const persistedSelection = this.loadSensorSelection();
 
@@ -203,9 +248,16 @@ export class TemperaturesPageComponent implements OnInit {
   private rebuildChart(): void {
     const labels = this.dayLabels();
 
-    const selectedSensorAddresses = this.activeSensors
-      .filter((sensor) => this.selectedSensors[sensor.sensorAddress])
-      .map((sensor) => sensor.sensorAddress);
+    const selectedGroups = this.sensorGroups
+      .map((group) => ({
+        name: group.name,
+        sensors: group.sensors.filter((sensor) => this.selectedSensors[sensor.sensorAddress])
+      }))
+      .filter((group) => group.sensors.length > 0);
+
+    const selectedSensorAddresses = selectedGroups.flatMap((group) =>
+      group.sensors.map((sensor) => sensor.sensorAddress)
+    );
 
     const mapBySensor = new Map<string, Map<string, number>>();
 
@@ -226,20 +278,35 @@ export class TemperaturesPageComponent implements OnInit {
       mapBySensor.set(sensorAddress, valueByLabel);
     }
 
-    this.lineChartData = {
-      labels,
-      datasets: selectedSensorAddresses.map((sensorAddress) => {
-        const sensor = this.activeSensors.find((s) => s.sensorAddress === sensorAddress);
-        const color = sensor?.color || '#f26a2e';
-        const valueByLabel = mapBySensor.get(sensorAddress) ?? new Map<string, number>();
-        const lineType = sensor?.lineType || this.getLineTypesMap()[sensorAddress] || 'solid';
-        const borderDash = this.getLineDash(lineType);
+    const datasets: ChartData<'line'>['datasets'] = [];
+    this.datasetGroupNames = [];
+    this.datasetLegendColors = [];
+    const lineTypes = this.getLineTypesMap();
 
-        return {
+    for (const group of selectedGroups) {
+      const shouldFillBetweenLines = group.sensors.length === 2;
+      const areaColor = shouldFillBetweenLines
+        ? this.hexColorWithAlpha(group.sensors[0]?.color || '#f26a2e', '30')
+        : '';
+
+      for (let index = 0; index < group.sensors.length; index += 1) {
+        const sensor = group.sensors[index];
+        const sensorAddress = sensor.sensorAddress;
+        const color = sensor.color || '#f26a2e';
+        const valueByLabel = mapBySensor.get(sensorAddress) ?? new Map<string, number>();
+        const lineType = sensor.lineType || lineTypes[sensorAddress] || 'solid';
+        const borderDash = this.getLineDash(lineType);
+        const legendColor = areaColor || this.hexColorWithAlpha(color, '30');
+
+        this.datasetGroupNames.push(group.name);
+        this.datasetLegendColors.push(legendColor);
+
+        datasets.push({
           label: this.sensorDisplayName(sensorAddress),
           data: labels.map((label) => valueByLabel.get(label) ?? null),
           borderColor: color,
-          backgroundColor: `${color}44`,
+          backgroundColor: shouldFillBetweenLines && index === 1 ? areaColor : `${color}44`,
+          fill: shouldFillBetweenLines && index === 1 ? '-1' : false,
           showLine: true,
           spanGaps: true,
           tension: 0.2,
@@ -247,8 +314,13 @@ export class TemperaturesPageComponent implements OnInit {
           pointHoverRadius: 2,
           borderWidth: 1,
           borderDash
-        };
-      })
+        });
+      }
+    }
+
+    this.lineChartData = {
+      labels,
+      datasets
     };
   }
 
@@ -259,6 +331,90 @@ export class TemperaturesPageComponent implements OnInit {
     }
 
     return sensor.name?.trim() ? sensor.name : sensor.sensorAddress;
+  }
+
+  private sensorGroupName(sensor: SensorRead): string {
+    return sensor.groupName?.trim() || this.ungroupedLabel;
+  }
+
+  private buildSensorGroups(sensors: SensorRead[]): SensorGroup[] {
+    const grouped = new Map<string, SensorRead[]>();
+
+    for (const sensor of sensors) {
+      const groupName = this.sensorGroupName(sensor);
+      const list = grouped.get(groupName);
+      if (list) {
+        list.push(sensor);
+        continue;
+      }
+      grouped.set(groupName, [sensor]);
+    }
+
+    return [...grouped.entries()]
+      .sort(([left], [right]) => left.localeCompare(right, 'de', { sensitivity: 'base' }))
+      .map(([name, groupSensors]) => ({
+        name,
+        sensors: groupSensors.sort((left, right) => this.sensorDisplaySortKey(left).localeCompare(this.sensorDisplaySortKey(right), 'de', { sensitivity: 'base' }))
+      }));
+  }
+
+  private sensorDisplaySortKey(sensor: SensorRead): string {
+    return sensor.name?.trim() || sensor.sensorAddress;
+  }
+
+  private hexColorWithAlpha(color: string, alphaHex: string): string {
+    if (/^#[0-9a-fA-F]{6}$/.test(color)) {
+      return `${color}${alphaHex}`;
+    }
+    if (/^#[0-9a-fA-F]{8}$/.test(color)) {
+      return `${color.slice(0, 7)}${alphaHex}`;
+    }
+    return `#f26a2e${alphaHex}`;
+  }
+
+  private buildGroupLegendLabels(chart: Chart): LegendItem[] {
+    const groupItems = new Map<string, LegendItem>();
+
+    chart.data.datasets.forEach((_dataset, datasetIndex) => {
+      const groupName = this.datasetGroupNames[datasetIndex];
+      if (!groupName || groupItems.has(groupName)) {
+        return;
+      }
+
+      const legendColor = this.datasetLegendColors[datasetIndex] || '#f26a2e30';
+      const isVisible = chart.isDatasetVisible(datasetIndex);
+
+      groupItems.set(groupName, {
+        text: groupName,
+        fillStyle: legendColor,
+        strokeStyle: legendColor,
+        lineWidth: 2,
+        hidden: !isVisible,
+        datasetIndex
+      });
+    });
+
+    return [...groupItems.values()];
+  }
+
+  private toggleGroupDatasets(chart: Chart, groupName: string): void {
+    const targetIndexes: number[] = [];
+
+    chart.data.datasets.forEach((_dataset, index) => {
+      if (this.datasetGroupNames[index] === groupName) {
+        targetIndexes.push(index);
+      }
+    });
+
+    if (targetIndexes.length === 0) {
+      return;
+    }
+
+    const shouldShow = targetIndexes.some((index) => !chart.isDatasetVisible(index));
+    for (const index of targetIndexes) {
+      chart.setDatasetVisibility(index, shouldShow);
+    }
+    chart.update();
   }
 
   private getLineTypesMap(): Record<string, 'solid' | 'dotted' | 'dashed'> {

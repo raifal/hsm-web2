@@ -29,23 +29,23 @@
   <div class="content-grid">
     <aside class="sensor-list-panel" [class.modal-open]="showSensorFilterModal">
       <div class="sensor-list-header">
-        <h2>Aktive Sensoren</h2>
+        <h2>Sensor-Gruppen</h2>
         <button (click)="closeSensorFilter()" class="close-modal-btn" title="Schließen">✕</button>
       </div>
-      @if (activeSensors.length === 0) {
+      @if (sensorGroups.length === 0) {
         <p>Keine aktiven Sensoren gefunden.</p>
       }
 
       <div class="sensor-list">
-        @for (sensor of activeSensors; track sensor.sensorAddress) {
+        @for (group of sensorGroups; track group.name) {
           <label class="sensor-item">
             <input
               type="checkbox"
-              [(ngModel)]="selectedSensors[sensor.sensorAddress]"
-              (change)="onSensorSelectionChanged()"
+              [checked]="isGroupSelected(group.name)"
+              [indeterminate]="isGroupPartiallySelected(group.name)"
+              (change)="onGroupSelectionChanged(group.name, $any($event.target).checked)"
             />
-            <span class="swatch" [style.backgroundColor]="sensor.color || '#f26a2e'"></span>
-            <span>{{ sensor.name || sensor.sensorAddress }}</span>
+            <span>{{ group.name }} ({{ group.sensors.length }})</span>
           </label>
         }
       </div>
